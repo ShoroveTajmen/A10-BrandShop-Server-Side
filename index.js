@@ -20,7 +20,7 @@ app.use(express.json());
 const uri =
   `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.es62grd.mongodb.net/?retryWrites=true&w=majority`;
 
-  
+
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -32,8 +32,35 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+
+    //create a database and database collection
+    const productCollection = client.db('productDB').collection('products');
+
+    //using get method to read the data what i stored in database
+    app.get('/product', async(req, res)=>{
+        const cursor = productCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+    })
+
+    //using post method to store product in the database
+    app.post('/product', async(req, res) => {
+        const newProduct = req.body;
+        console.log(newProduct);
+        const result = await productCollection.insertOne(newProduct);
+        res.send(result);
+    })
+
+
+
+
+
+
+
+
+
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
@@ -51,5 +78,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Coffee server is running on port ${port}`);
+  console.log(`Brand Shop server is running on port ${port}`);
 });
