@@ -29,8 +29,11 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    //create a database and database collection
+    //create a database and database collection for all products
     const productCollection = client.db("productDB").collection("products");
+
+    //create a database collection for cart
+    const cartCollection = client.db("productDB").collection("cart");
 
     //using get method to read the data what i stored in database
     app.get("/product", async (req, res) => {
@@ -79,6 +82,25 @@ async function run() {
       );
       res.send(result);
     });
+
+
+    //cart related API request
+
+    //using get method to read cart products data
+    app.get("/addCart", async (req, res) => {
+        const cursor = cartCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+      });
+
+    // using post method to store carts to the database
+    app.post("/addCart", async (req, res) => {
+        const cartProductData = req.body;
+        console.log(cartProductData);
+        const result = await cartCollection.insertOne(cartProductData);
+        res.send(result);
+      });
+
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
